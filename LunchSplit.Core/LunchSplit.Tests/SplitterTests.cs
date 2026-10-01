@@ -18,4 +18,18 @@ public class SplitterTests
         // Assert
         Assert.AreEqual(0.00m, tip);
     }
+
+
+    [TestMethod]
+    public void ComputeTip_PercentTipMode_ReturnsCorrectPercent()
+    {
+        // Arrange
+        var splitter = new Splitter();
+
+        // Act
+        decimal tip = splitter.ComputeTip(120.00m, TipMode.Percent, 15m);
+
+        // Assert
+        Assert.AreEqual(18.00m, tip);
+    }
 }
