@@ -59,4 +59,16 @@ public class SplitterTests
         Assert.ThrowsExactly<ArgumentOutOfRangeException>(
             () => splitter.ComputeTip(-1.00m, TipMode.Percent, 15m));
     }
+
+
+    [TestMethod]
+    public void ComputeTip_NegativeFixedTip_ThrowsException()
+    {
+        // Arrange
+        var splitter = new Splitter();
+
+        // Act + Assert
+        Assert.ThrowsExactly<ArgumentOutOfRangeException>(
+            () => splitter.ComputeTip(100.00m, TipMode.Fixed, -5.00m));
+    }
 }
