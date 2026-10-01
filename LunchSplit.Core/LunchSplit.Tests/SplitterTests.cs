@@ -46,4 +46,17 @@ public class SplitterTests
         // Assert
         Assert.AreEqual(15.00m, tip);
     }
+
+
+
+    [TestMethod]
+    public void ComputeTip_NegativeSubtotal_ThrowsException()
+    {
+        // Arrange
+        var splitter = new Splitter();
+
+        // Act + Assert
+        Assert.ThrowsExactly<ArgumentOutOfRangeException>(
+            () => splitter.ComputeTip(-1.00m, TipMode.Percent, 15m));
+    }
 }
