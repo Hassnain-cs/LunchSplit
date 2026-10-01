@@ -4,6 +4,13 @@ public class Splitter
 {
     public decimal ComputeTip(decimal subtotal, TipMode mode, decimal tipInput)
     {
+
+        if (subtotal < 0)
+        {
+            throw new ArgumentOutOfRangeException(nameof(subtotal), "Subtotal cannot be negative.");
+        }
+
+
         if (mode == TipMode.Percent)
         {
             return subtotal * tipInput / 100m;
