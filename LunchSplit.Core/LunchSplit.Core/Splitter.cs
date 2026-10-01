@@ -18,6 +18,11 @@ public class Splitter
 
         if (mode == TipMode.Fixed)
         {
+            if (tipInput < 0)
+            {
+                throw new ArgumentOutOfRangeException(nameof(tipInput), "Fixed tip cannot be negative.");
+            }
+
             return tipInput;
         }
 
