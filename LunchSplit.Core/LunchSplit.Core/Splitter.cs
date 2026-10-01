@@ -9,6 +9,11 @@ public class Splitter
             return subtotal * tipInput / 100m;
         }
 
+        if (mode == TipMode.Fixed)
+        {
+            return tipInput;
+        }
+
         return 0m;
     }
 }
