@@ -32,4 +32,18 @@ public class SplitterTests
         // Assert
         Assert.AreEqual(18.00m, tip);
     }
+
+
+    [TestMethod]
+    public void ComputeTip_FixedTipMode_ReturnsFixedAmount()
+    {
+        // Arrange
+        var splitter = new Splitter();
+
+        // Act
+        decimal tip = splitter.ComputeTip(100.00m, TipMode.Fixed, 15.00m);
+
+        // Assert
+        Assert.AreEqual(15.00m, tip);
+    }
 }
