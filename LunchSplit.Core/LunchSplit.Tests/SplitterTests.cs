@@ -88,4 +88,20 @@ public class SplitterTests
         Assert.AreEqual(30.00m, shares[1].Amount);
         Assert.AreEqual(30.00m, shares[2].Amount);
     }
+
+    [TestMethod]
+    public void CalculateShares_ProportionalSplit_ApportionsWeighted()
+    {
+        // Arrange
+        var splitter = new Splitter();
+        var bill = new Bill(90.00m, 0m, TipMode.None, 0m);
+        var attendees = new List<Attendee> { new("Alice", 2), new("Bob", 1) };
+
+        // Act
+        List<Share> shares = splitter.CalculateShares(bill, attendees, RoundingMode.None);
+
+        // Assert
+        Assert.AreEqual(60.00m, shares[0].Amount);
+        Assert.AreEqual(30.00m, shares[1].Amount);
+    }
 }
