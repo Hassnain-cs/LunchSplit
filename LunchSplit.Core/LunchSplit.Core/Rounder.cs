@@ -21,6 +21,11 @@ public class Rounder
             return Math.Ceiling(value * 100m) / 100m;
         }
 
+        if (mode == RoundingMode.RoundDown)
+        {
+            return Math.Floor(value * 100m) / 100m;
+        }
+
         return Math.Round(value, 2, MidpointRounding.ToEven);
     }
 }
