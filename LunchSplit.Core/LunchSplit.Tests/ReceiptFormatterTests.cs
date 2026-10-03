@@ -1,32 +1,45 @@
-﻿using System.Globalization;
-using System.Text;
+﻿using LunchSplit.Core;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace LunchSplit.Core;
+namespace LunchSplit.Tests;
 
-public class ReceiptFormatter
+[TestClass]
+public class ReceiptFormatterTests
 {
-    public ReceiptFormatter(string studentName)
+    [TestMethod]
+    public void Format_DefaultBillReceipt_ContainsLineItems()
     {
+        // Arrange
+        var formatter = new ReceiptFormatter("Your Name");
+        var bill = new Bill(100.00m, 13.00m, TipMode.Percent, 15m);
+        var attendees = new List<Attendee> { new("Alice"), new("Bob") };
+        var shares = new List<Share> { new("Alice", 64.00m), new("Bob", 64.00m) };
+
+        // Act
+        string receipt = formatter.Format(bill, attendees, shares);
+
+        // Assert
+        Assert.IsTrue(receipt.Contains("Alice: $64.00"));
+        Assert.IsTrue(receipt.Contains("Bob: $64.00"));
+        Assert.IsTrue(receipt.Contains("Grand Total: $128.00"));
     }
 
-    public string Format(Bill bill, List<Attendee> attendees, List<Share> roundedShares)
+    [TestMethod]
+    public void Format_ReceiptOutput_ContainsRequiredMetadata()
     {
-        var sb = new StringBuilder();
+        // Arrange
+        var fixedClock = new DateTime(2026, 9, 30, 14, 30, 0);
+        var formatter = new ReceiptFormatter("Muhammad Hassnain", () => fixedClock);
+        var bill = new Bill(100.00m, 13.00m, TipMode.None, 0m);
+        var attendees = new List<Attendee> { new("Alice") };
+        var shares = new List<Share> { new("Alice", 113.00m) };
 
-        sb.AppendLine("LunchSplit Receipt");
-        sb.AppendLine($"Subtotal: {Money(bill.Subtotal)}");
-        sb.AppendLine($"Tax: {Money(bill.Tax)}");
-        sb.AppendLine($"Tip: {Money(bill.Tip)}");
-        sb.AppendLine($"Grand Total: {Money(bill.GrandTotal)}");
+        // Act
+        string receipt = formatter.Format(bill, attendees, shares);
 
-        foreach (Share share in roundedShares)
-        {
-            sb.AppendLine($"{share.Name}: {Money(share.Amount)}");
-        }
-
-        return sb.ToString();
+        // Assert
+        Assert.IsTrue(receipt.Contains("Student: Muhammad Hassnain"));
+        Assert.IsTrue(receipt.Contains("Date: 2026-09-30"));
+        Assert.IsTrue(receipt.Contains("Created: 2026-09-30 14:30:00"));
     }
-
-    private static string Money(decimal value)
-        => "$" + value.ToString("0.00", CultureInfo.InvariantCulture);
 }
