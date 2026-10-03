@@ -22,4 +22,19 @@ public class BillValidatorTests
         Assert.IsTrue(result.IsValid);
         Assert.AreEqual(0, result.Errors.Count);
     }
+
+    [TestMethod]
+    public void Validate_EmptyAttendeeCollection_ReturnsFail()
+    {
+        // Arrange
+        var validator = new BillValidator();
+        var attendees = new List<Attendee>();
+
+        // Act
+        ValidationResult result = validator.Validate(ValidBill(), attendees);
+
+        // Assert
+        Assert.IsFalse(result.IsValid);
+        Assert.IsTrue(result.Errors.Any(e => e.Contains("attendee")));
+    }
 }
