@@ -155,4 +155,17 @@ public class SplitterTests
         Assert.AreEqual(133.00m, shares.Sum(s => s.Amount));
         Assert.AreEqual(66.50m, shares[0].Amount);
     }
+
+    [TestMethod]
+    public void CalculateShares_AllAttendeesExcluded_ThrowsException()
+    {
+        // Arrange
+        var splitter = new Splitter();
+        var bill = new Bill(90.00m, 0m, TipMode.None, 0m);
+        var attendees = new List<Attendee> { new("Alice", 1, false), new("Bob", 1, false) };
+
+        // Act + Assert
+        Assert.ThrowsExactly<InvalidOperationException>(
+            () => splitter.CalculateShares(bill, attendees, RoundingMode.None));
+    }
 }

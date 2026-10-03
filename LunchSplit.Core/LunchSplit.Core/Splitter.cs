@@ -12,6 +12,10 @@ public class Splitter
     public List<Share> CalculateShares(Bill bill, List<Attendee> attendees, RoundingMode roundingMode)
     {
         List<Attendee> active = attendees.Where(a => a.Included).ToList();
+        if (active.Count == 0)
+        {
+            throw new InvalidOperationException("At least one attendee must be included in the split.");
+        }
         int totalWeight = active.Sum(a => a.Weight);
         decimal grandTotal = bill.GrandTotal;
 
