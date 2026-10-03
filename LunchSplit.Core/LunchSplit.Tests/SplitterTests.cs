@@ -121,4 +121,21 @@ public class SplitterTests
         Assert.AreEqual(45.00m, shares[1].Amount);
         Assert.AreEqual(0.00m, shares[2].Amount);
     }
+
+    [TestMethod]
+    public void CalculateShares_TaxAndPercentTip_ApportionsTotal()
+    {
+        // Arrange
+        var splitter = new Splitter();
+        var bill = new Bill(100.00m, 13.00m, TipMode.Percent, 15m);
+        var attendees = new List<Attendee> { new("Alice"), new("Bob") };
+
+        // Act
+        List<Share> shares = splitter.CalculateShares(bill, attendees, RoundingMode.Bankers);
+
+        // Assert
+        Assert.AreEqual(128.00m, bill.GrandTotal);
+        Assert.AreEqual(128.00m, shares.Sum(s => s.Amount));
+        Assert.AreEqual(64.00m, shares[0].Amount);
+    }
 }
