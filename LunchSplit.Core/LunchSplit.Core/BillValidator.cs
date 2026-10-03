@@ -16,6 +16,11 @@ public class BillValidator
             errors.Add("At least one attendee is required.");
         }
 
+        if (bill.Tax < 0)
+        {
+            errors.Add("Tax cannot be negative. Please enter 0 or more.");
+        }
+
         return new ValidationResult(errors);
     }
 
