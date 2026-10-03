@@ -39,4 +39,18 @@ public class RounderTests
         Assert.AreEqual(10.32m, result[0].Amount);
         Assert.AreEqual(10.34m, result[1].Amount);
     }
+
+    [TestMethod]
+    public void RoundShares_RoundUp_AppliesCeilingToCents()
+    {
+        // Arrange
+        var rounder = new Rounder();
+        var raw = new List<Share> { new("Alice", 10.331m) };
+
+        // Act
+        List<Share> result = rounder.RoundShares(raw, RoundingMode.RoundUp);
+
+        // Assert
+        Assert.AreEqual(10.34m, result[0].Amount);
+    }
 }

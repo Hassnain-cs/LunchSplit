@@ -4,13 +4,23 @@ public class Rounder
 {
     public List<Share> RoundShares(List<Share> rawShares, RoundingMode mode)
     {
-        if (mode == RoundingMode.Bankers)
+        if (mode == RoundingMode.None)
         {
-            return rawShares
-                .Select(s => s with { Amount = Math.Round(s.Amount, 2, MidpointRounding.ToEven) })
-                .ToList();
+            return rawShares.ToList();
         }
 
-        return rawShares.ToList();
+        return rawShares
+            .Select(s => s with { Amount = RoundToCents(s.Amount, mode) })
+            .ToList();
+    }
+
+    private static decimal RoundToCents(decimal value, RoundingMode mode)
+    {
+        if (mode == RoundingMode.RoundUp)
+        {
+            return Math.Ceiling(value * 100m) / 100m;
+        }
+
+        return Math.Round(value, 2, MidpointRounding.ToEven);
     }
 }
