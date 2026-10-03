@@ -26,6 +26,15 @@ public class Splitter
             return tipInput;
         }
 
+
+
         return 0m;
+    }
+
+    public List<Share> CalculateShares(Bill bill, List<Attendee> attendees, RoundingMode roundingMode)
+    {
+        decimal each = bill.Subtotal / attendees.Count;
+
+        return attendees.Select(a => new Share(a.Name, each)).ToList();
     }
 }

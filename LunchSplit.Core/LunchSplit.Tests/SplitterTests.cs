@@ -71,4 +71,21 @@ public class SplitterTests
         Assert.ThrowsExactly<ArgumentOutOfRangeException>(
             () => splitter.ComputeTip(100.00m, TipMode.Fixed, -5.00m));
     }
+
+    [TestMethod]
+    public void CalculateShares_EqualSplit_ApportionsEvenly()
+    {
+        // Arrange
+        var splitter = new Splitter();
+        var bill = new Bill(90.00m, 0m, TipMode.None, 0m);
+        var attendees = new List<Attendee> { new("Alice"), new("Bob"), new("Cara") };
+
+        // Act
+        List<Share> shares = splitter.CalculateShares(bill, attendees, RoundingMode.None);
+
+        // Assert
+        Assert.AreEqual(30.00m, shares[0].Amount);
+        Assert.AreEqual(30.00m, shares[1].Amount);
+        Assert.AreEqual(30.00m, shares[2].Amount);
+    }
 }
