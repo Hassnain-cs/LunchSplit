@@ -6,6 +6,11 @@ public class BillValidator
     {
         var errors = new List<string>();
 
+        if (bill.Subtotal < 0)
+        {
+            errors.Add("Subtotal cannot be negative. Please enter 0 or more.");
+        }
+
         if (attendees.Count == 0)
         {
             errors.Add("At least one attendee is required.");

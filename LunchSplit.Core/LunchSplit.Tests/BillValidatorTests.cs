@@ -37,4 +37,20 @@ public class BillValidatorTests
         Assert.IsFalse(result.IsValid);
         Assert.IsTrue(result.Errors.Any(e => e.Contains("attendee")));
     }
+
+    [TestMethod]
+    public void Validate_NegativeSubtotal_ReturnsFail()
+    {
+        // Arrange
+        var validator = new BillValidator();
+        var bill = new Bill(-10.00m, 0m, TipMode.None, 0m);
+        var attendees = new List<Attendee> { new("Alice") };
+
+        // Act
+        ValidationResult result = validator.Validate(bill, attendees);
+
+        // Assert
+        Assert.IsFalse(result.IsValid);
+        Assert.IsTrue(result.Errors.Any(e => e.Contains("Subtotal")));
+    }
 }
