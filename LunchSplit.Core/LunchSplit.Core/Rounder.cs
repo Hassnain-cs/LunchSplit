@@ -4,6 +4,11 @@ public class Rounder
 {
     public List<Share> RoundShares(List<Share> rawShares, RoundingMode mode)
     {
+        if (rawShares.Count == 0)
+        {
+            return new List<Share>();
+        }
+
         if (mode == RoundingMode.None)
         {
             return rawShares.ToList();
@@ -17,7 +22,23 @@ public class Rounder
         decimal targetTotal = RoundToCents(rawTotal, mode);
         decimal leftover = targetTotal - rounded.Sum(s => s.Amount);
 
-        rounded[0] = rounded[0] with { Amount = rounded[0].Amount + leftover };
+        int pennies = (int)Math.Round(Math.Abs(leftover) / 0.01m);
+        decimal step = leftover > 0 ? 0.01m : -0.01m;
+
+        List<int> payers = Enumerable.Range(0, rounded.Count)
+            .Where(i => rawShares[i].Amount > 0)
+            .ToList();
+
+        if (payers.Count == 0)
+        {
+            return rounded;
+        }
+
+        for (int i = 0; i < pennies; i++)
+        {
+            int index = payers[i % payers.Count];
+            rounded[index] = rounded[index] with { Amount = rounded[index].Amount + step };
+        }
 
         return rounded;
     }

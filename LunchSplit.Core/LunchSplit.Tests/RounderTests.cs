@@ -85,4 +85,18 @@ public class RounderTests
         Assert.AreEqual(3.33m, result[2].Amount);
         Assert.AreEqual(10.00m, result.Sum(s => s.Amount));
     }
+
+    [TestMethod]
+    public void RoundShares_EmptyShareCollection_ReturnsEmpty()
+    {
+        // Arrange
+        var rounder = new Rounder();
+        var raw = new List<Share>();
+
+        // Act
+        List<Share> result = rounder.RoundShares(raw, RoundingMode.Bankers);
+
+        // Assert
+        Assert.AreEqual(0, result.Count);
+    }
 }
