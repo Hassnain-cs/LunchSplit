@@ -33,10 +33,11 @@ public class Splitter
 
     public List<Share> CalculateShares(Bill bill, List<Attendee> attendees, RoundingMode roundingMode)
     {
-        int totalWeight = attendees.Sum(a => a.Weight);
+        List<Attendee> active = attendees.Where(a => a.Included).ToList();
+        int totalWeight = active.Sum(a => a.Weight);
 
         return attendees
-            .Select(a => new Share(a.Name, bill.Subtotal * a.Weight / totalWeight))
+            .Select(a => new Share(a.Name, a.Included ? bill.Subtotal * a.Weight / totalWeight : 0m))
             .ToList();
     }
 }
