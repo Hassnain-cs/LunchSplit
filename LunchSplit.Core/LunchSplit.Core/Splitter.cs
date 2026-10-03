@@ -17,6 +17,11 @@ public class Splitter
             throw new InvalidOperationException("At least one attendee must be included in the split.");
         }
         int totalWeight = active.Sum(a => a.Weight);
+
+        if (totalWeight <= 0)
+        {
+            throw new InvalidOperationException("Total weight must be greater than zero.");
+        }
         decimal grandTotal = bill.GrandTotal;
 
         List<Share> rawShares = attendees

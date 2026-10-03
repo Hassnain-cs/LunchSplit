@@ -168,4 +168,17 @@ public class SplitterTests
         Assert.ThrowsExactly<InvalidOperationException>(
             () => splitter.CalculateShares(bill, attendees, RoundingMode.None));
     }
+
+    [TestMethod]
+    public void CalculateShares_TotalWeightsZero_ThrowsException()
+    {
+        // Arrange
+        var splitter = new Splitter();
+        var bill = new Bill(90.00m, 0m, TipMode.None, 0m);
+        var attendees = new List<Attendee> { new("Alice", 0), new("Bob", 0) };
+
+        // Act + Assert
+        Assert.ThrowsExactly<InvalidOperationException>(
+            () => splitter.CalculateShares(bill, attendees, RoundingMode.None));
+    }
 }
