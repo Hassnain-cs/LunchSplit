@@ -23,4 +23,20 @@ public class RounderTests
         Assert.AreEqual(3.3333m, result[0].Amount);
     }
 
+
+
+    [TestMethod]
+    public void RoundShares_BankersRounding_RoundsToNearestEven()
+    {
+        // Arrange
+        var rounder = new Rounder();
+        var raw = new List<Share> { new("Alice", 10.325m), new("Bob", 10.335m) };
+
+        // Act
+        List<Share> result = rounder.RoundShares(raw, RoundingMode.Bankers);
+
+        // Assert
+        Assert.AreEqual(10.32m, result[0].Amount);
+        Assert.AreEqual(10.34m, result[1].Amount);
+    }
 }
