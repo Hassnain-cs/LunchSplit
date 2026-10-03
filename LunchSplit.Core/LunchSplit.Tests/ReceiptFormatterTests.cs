@@ -42,4 +42,17 @@ public class ReceiptFormatterTests
         Assert.IsTrue(receipt.Contains("Date: 2026-09-30"));
         Assert.IsTrue(receipt.Contains("Created: 2026-09-30 14:30:00"));
     }
+
+
+    [TestMethod]
+    [TestCategory("RED")]
+    public void Format_CsvReceiptExporter_MatchesSchema()
+    {
+        // Arrange: the CSV exporter (Feature F5) does not exist yet.
+
+        // Act: nothing to run until F5 is built.
+
+        // Assert
+        Assert.Fail("RED/PENDING: CSV receipt exporter (Feature F5) is not implemented yet.");
+    }
 }
