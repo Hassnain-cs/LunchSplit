@@ -181,4 +181,16 @@ public class SplitterTests
         Assert.ThrowsExactly<InvalidOperationException>(
             () => splitter.CalculateShares(bill, attendees, RoundingMode.None));
     }
+
+    [TestMethod]
+    [TestCategory("RED")]
+    public void CalculateShares_PaymentRequest_ValidatesStripeMock()
+    {
+        // Arrange: the Stripe payment gateway (Feature F6) does not exist yet.
+
+        // Act: nothing to run until F6 is built.
+
+        // Assert
+        Assert.Fail("RED/PENDING: Stripe payment gateway (Feature F6) is not implemented yet.");
+    }
 }
