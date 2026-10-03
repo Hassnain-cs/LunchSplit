@@ -9,9 +9,17 @@ public class Rounder
             return rawShares.ToList();
         }
 
-        return rawShares
+        List<Share> rounded = rawShares
             .Select(s => s with { Amount = RoundToCents(s.Amount, mode) })
             .ToList();
+
+        decimal rawTotal = Math.Round(rawShares.Sum(s => s.Amount), 6);
+        decimal targetTotal = RoundToCents(rawTotal, mode);
+        decimal leftover = targetTotal - rounded.Sum(s => s.Amount);
+
+        rounded[0] = rounded[0] with { Amount = rounded[0].Amount + leftover };
+
+        return rounded;
     }
 
     private static decimal RoundToCents(decimal value, RoundingMode mode)

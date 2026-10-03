@@ -67,4 +67,22 @@ public class RounderTests
         // Assert
         Assert.AreEqual(10.33m, result[0].Amount);
     }
+
+    [TestMethod]
+    public void RoundShares_UnevenSplit_ReconcilesRemainder()
+    {
+        // Arrange
+        var rounder = new Rounder();
+        decimal third = 10.00m / 3m;
+        var raw = new List<Share> { new("Alice", third), new("Bob", third), new("Cara", third) };
+
+        // Act
+        List<Share> result = rounder.RoundShares(raw, RoundingMode.Bankers);
+
+        // Assert
+        Assert.AreEqual(3.34m, result[0].Amount);
+        Assert.AreEqual(3.33m, result[1].Amount);
+        Assert.AreEqual(3.33m, result[2].Amount);
+        Assert.AreEqual(10.00m, result.Sum(s => s.Amount));
+    }
 }
