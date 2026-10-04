@@ -84,4 +84,21 @@ public class BillValidatorTests
         Assert.IsFalse(result.IsValid);
         Assert.AreEqual(1, result.Errors.Count);
     }
+
+    [TestMethod]
+    public void Validate_NegativeAttendeeWeight_ReturnsFail()
+    {
+        // Arrange
+        var validator = new BillValidator();
+        var attendees = new List<Attendee> { new("Alice", -1) };
+
+        // Act
+        ValidationResult result = validator.Validate(ValidBill(), attendees);
+
+        // Assert
+        Assert.IsFalse(result.IsValid);
+        Assert.IsTrue(result.Errors.Any(e => e.Contains("weight")));
+    }
+
+      
 }
