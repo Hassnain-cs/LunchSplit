@@ -193,4 +193,19 @@ public class SplitterTests
         // Assert
         Assert.Fail("RED/PENDING: Stripe payment gateway (Feature F6) is not implemented yet.");
     }
+
+    [TestMethod]
+    public void CalculateShares_UnevenGroup_SharesSumToGrandTotal()
+    {
+        // Arrange
+        var splitter = new Splitter();
+        var bill = new Bill(100.00m, 13.00m, TipMode.Percent, 15m);
+        var attendees = new List<Attendee> { new("Alice"), new("Bob"), new("Cara") };
+
+        // Act
+        List<Share> shares = splitter.CalculateShares(bill, attendees, RoundingMode.RoundDown);
+
+        // Assert
+        Assert.AreEqual(bill.GrandTotal, shares.Sum(s => s.Amount));
+    }
 }
