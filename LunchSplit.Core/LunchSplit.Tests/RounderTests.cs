@@ -99,4 +99,20 @@ public class RounderTests
         // Assert
         Assert.AreEqual(0, result.Count);
     }
+
+    [TestMethod]
+    public void RoundShares_ZeroShare_NeverReceivesReconciledPenny()
+    {
+        // Arrange
+        var rounder = new Rounder();
+        decimal third = 10.00m / 3m;
+        var raw = new List<Share> { new("Alice", 0m), new("Bob", third), new("Cara", third), new("Dan", third) };
+
+        // Act
+        List<Share> result = rounder.RoundShares(raw, RoundingMode.Bankers);
+
+        // Assert
+        Assert.AreEqual(0.00m, result[0].Amount);
+        Assert.AreEqual(10.00m, result.Sum(s => s.Amount));
+    }
 }
