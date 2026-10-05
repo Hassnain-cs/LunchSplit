@@ -2,7 +2,7 @@
 
 Restaurant bill-splitting domain logic built with Test-Driven Development in C# / .NET 8, tested with MSTest.
 
-**Author:** Your Name
+**Author:** Muhammad Hassnain
 
 ## Projects
 - `LunchSplit.Core` - domain model and engines: Bill, Attendee, Share, Splitter, Rounder, BillValidator, ReceiptFormatter (plus TipCalculator, TipMode, RoundingMode, ValidationResult)
