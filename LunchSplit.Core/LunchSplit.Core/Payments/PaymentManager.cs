@@ -1,0 +1,43 @@
+﻿/*
+ * FILE          : PaymentManager.cs
+ * PROJECT       : CSCN72010 - Assignment 3
+ * PROGRAMMER    : Muhammad Hassnain
+ * FIRST VERSION : 2026-11-15
+ */
+
+namespace LunchSplit.Core.Payments;
+
+/*
+ *  NAME    : PaymentManager
+ *  PURPOSE : The business rules around taking payments. It depends only on
+ *            IPaymentProcessor, never on Square directly, which is what
+ *            lets us test it with a mock.
+ */
+public class PaymentManager
+{
+    private readonly IPaymentProcessor paymentProcessor;
+
+    //
+    // FUNCTION    : PaymentManager
+    // DESCRIPTION : Stores the processor this manager will hand work to.
+    // PARAMETERS  : IPaymentProcessor paymentProcessor : the gateway to use
+    // RETURNS     : none (constructor)
+    //
+    public PaymentManager(IPaymentProcessor paymentProcessor)
+    {
+        this.paymentProcessor = paymentProcessor;
+    }
+
+    //
+    // FUNCTION    : ProcessPaymentAsync
+    // DESCRIPTION : Passes the payment to the processor and returns its answer.
+    // PARAMETERS  : PaymentRequest request : what to charge
+    // RETURNS     : Task<PaymentResult> : the processor's result
+    //
+    public async Task<PaymentResult> ProcessPaymentAsync(PaymentRequest request)
+    {
+        PaymentResult result = await paymentProcessor.ProcessPaymentAsync(request);
+
+        return result;
+    }
+}
