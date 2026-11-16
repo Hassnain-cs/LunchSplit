@@ -64,4 +64,27 @@ public class PaymentManager
 
         return result;
     }
+
+    //
+    // FUNCTION    : ProcessBatchAsync
+    // DESCRIPTION :
+    //   Charges every request in the list, one at a time, and collects
+    //   all the results. One failure does not stop the others.
+    // PARAMETERS  : IEnumerable<PaymentRequest> requests : the payments to take
+    // RETURNS     : Task<BatchPaymentSummary> : every result plus the counts
+    //
+    public async Task<BatchPaymentSummary> ProcessBatchAsync(IEnumerable<PaymentRequest> requests)
+    {
+        List<PaymentResult> results = new List<PaymentResult>();
+
+        foreach (PaymentRequest request in requests)
+        {
+            PaymentResult result = await ProcessPaymentAsync(request);
+            results.Add(result);
+        }
+
+        BatchPaymentSummary summary = new BatchPaymentSummary(results);
+
+        return summary;
+    }
 }

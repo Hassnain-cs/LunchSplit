@@ -135,4 +135,39 @@ public class PaymentProcessorMoqTests
             processor => processor.ProcessPaymentAsync(It.IsAny<PaymentRequest>()),
             Times.Never);
     }
+
+    //
+    // FUNCTION    : ProcessBatch_FourAttendeeSplit_InvokesProcessorExactlyFourTimes
+    // DESCRIPTION :
+    //   A $100 bill split four ways gives four $25 payments. The processor
+    //   must be called exactly once per attendee.
+    // PARAMETERS  : none
+    // RETURNS     : Task : completes when the test finishes
+    //
+    [TestMethod]
+    [TestCategory("M3-06")]
+    public async Task ProcessBatch_FourAttendeeSplit_InvokesProcessorExactlyFourTimes()
+    {
+        // Arrange: four requests, one per attendee, each with its own key
+        Mock<IPaymentProcessor> fakeProcessor = new Mock<IPaymentProcessor>();
+        fakeProcessor
+            .Setup(processor => processor.ProcessPaymentAsync(It.IsAny<PaymentRequest>()))
+            .ReturnsAsync(PaymentResult.Success("tx-ok"));
+        PaymentManager manager = new PaymentManager(fakeProcessor.Object);
+        List<PaymentRequest> requests = new List<PaymentRequest>();
+
+        for (int i = 0; i < ATTENDEE_COUNT; i++)
+        {
+            requests.Add(SampleRequest(SHARE_AMOUNT, "key-" + i));
+        }
+
+        // Act
+        BatchPaymentSummary summary = await manager.ProcessBatchAsync(requests);
+
+        // Assert
+        Assert.AreEqual(ATTENDEE_COUNT, summary.SuccessCount);
+        fakeProcessor.Verify(
+            processor => processor.ProcessPaymentAsync(It.IsAny<PaymentRequest>()),
+            Times.Exactly(ATTENDEE_COUNT));
+    }
 }
