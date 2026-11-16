@@ -80,4 +80,32 @@ public class PaymentProcessorMoqTests
                 It.Is<PaymentRequest>(sent => sent.Amount == SHARE_AMOUNT)),
             Times.Once);
     }
+
+    //
+    // FUNCTION    : ProcessPayment_GatewayNetworkTimeout_ThrowsPaymentGatewayTimeoutException
+    // DESCRIPTION :
+    //   If the gateway cannot be reached, the manager must throw our own
+    //   PaymentGatewayTimeoutException instead of leaking a raw network error.
+    // PARAMETERS  : none
+    // RETURNS     : Task : completes when the test finishes
+    //
+    [TestMethod]
+    [TestCategory("M3-03")]
+    public async Task ProcessPayment_GatewayNetworkTimeout_ThrowsPaymentGatewayTimeoutException()
+    {
+        // Arrange: the fake processor behaves as if the network died
+        Mock<IPaymentProcessor> fakeProcessor = new Mock<IPaymentProcessor>();
+        fakeProcessor
+            .Setup(processor => processor.ProcessPaymentAsync(It.IsAny<PaymentRequest>()))
+            .ThrowsAsync(new HttpRequestException("simulated network timeout"));
+        PaymentManager manager = new PaymentManager(fakeProcessor.Object);
+
+        // Act
+        PaymentGatewayTimeoutException thrown =
+            await Assert.ThrowsExactlyAsync<PaymentGatewayTimeoutException>(
+                async () => await manager.ProcessPaymentAsync(SampleRequest()));
+
+        // Assert: the original error is kept inside for debugging
+        Assert.IsNotNull(thrown.InnerException);
+    }
 }

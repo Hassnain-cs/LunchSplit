@@ -30,13 +30,25 @@ public class PaymentManager
 
     //
     // FUNCTION    : ProcessPaymentAsync
-    // DESCRIPTION : Passes the payment to the processor and returns its answer.
+    // DESCRIPTION :
+    //   Passes the payment to the processor. If the network fails, the raw
+    //   HttpRequestException is wrapped in our own timeout exception.
     // PARAMETERS  : PaymentRequest request : what to charge
     // RETURNS     : Task<PaymentResult> : the processor's result
     //
     public async Task<PaymentResult> ProcessPaymentAsync(PaymentRequest request)
     {
-        PaymentResult result = await paymentProcessor.ProcessPaymentAsync(request);
+        PaymentResult result;
+
+        try
+        {
+            result = await paymentProcessor.ProcessPaymentAsync(request);
+        }
+        catch (HttpRequestException ex)
+        {
+            throw new PaymentGatewayTimeoutException(
+                "The payment gateway could not be reached in time.", ex);
+        }
 
         return result;
     }
