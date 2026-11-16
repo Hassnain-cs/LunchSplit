@@ -16,6 +16,7 @@ namespace LunchSplit.Core.Payments;
 public class PaymentManager
 {
     private readonly IPaymentProcessor paymentProcessor;
+    private const decimal ZERO_AMOUNT = 0m;
 
     //
     // FUNCTION    : PaymentManager
@@ -31,23 +32,34 @@ public class PaymentManager
     //
     // FUNCTION    : ProcessPaymentAsync
     // DESCRIPTION :
-    //   Passes the payment to the processor. If the network fails, the raw
-    //   HttpRequestException is wrapped in our own timeout exception.
+    //   Passes the payment to the processor. Zero or negative amounts are
+    //   rejected here without calling the processor. If the network fails,
+    //   the raw HttpRequestException is wrapped in our own timeout exception.
     // PARAMETERS  : PaymentRequest request : what to charge
-    // RETURNS     : Task<PaymentResult> : the processor's result
+    // RETURNS     : Task<PaymentResult> : the processor's result, or a failure
     //
     public async Task<PaymentResult> ProcessPaymentAsync(PaymentRequest request)
     {
         PaymentResult result;
 
-        try
+        // Rule: money must be positive. Check it here so a bad request
+        // never costs us a call to the gateway.
+        if (request.Amount <= ZERO_AMOUNT)
         {
-            result = await paymentProcessor.ProcessPaymentAsync(request);
+            result = PaymentResult.Failure(
+                "INVALID_AMOUNT", "Payment amount must be greater than zero.");
         }
-        catch (HttpRequestException ex)
+        else
         {
-            throw new PaymentGatewayTimeoutException(
-                "The payment gateway could not be reached in time.", ex);
+            try
+            {
+                result = await paymentProcessor.ProcessPaymentAsync(request);
+            }
+            catch (HttpRequestException ex)
+            {
+                throw new PaymentGatewayTimeoutException(
+                    "The payment gateway could not be reached in time.", ex);
+            }
         }
 
         return result;

@@ -108,4 +108,31 @@ public class PaymentProcessorMoqTests
         // Assert: the original error is kept inside for debugging
         Assert.IsNotNull(thrown.InnerException);
     }
+
+    //
+    // FUNCTION    : ProcessPayment_ZeroAmount_NeverInvokesProcessor
+    // DESCRIPTION :
+    //   A payment of zero dollars is rejected by the manager itself, and the
+    //   gateway must never be bothered with it.
+    // PARAMETERS  : none
+    // RETURNS     : Task : completes when the test finishes
+    //
+    [TestMethod]
+    [TestCategory("M3-05")]
+    public async Task ProcessPayment_ZeroAmount_NeverInvokesProcessor()
+    {
+        // Arrange
+        Mock<IPaymentProcessor> fakeProcessor = new Mock<IPaymentProcessor>();
+        PaymentManager manager = new PaymentManager(fakeProcessor.Object);
+
+        // Act
+        PaymentResult result = await manager.ProcessPaymentAsync(SampleRequest(0.00m));
+
+        // Assert: rejected for the right reason, and the processor was never called
+        Assert.IsFalse(result.IsSuccess);
+        Assert.AreEqual("INVALID_AMOUNT", result.ErrorCode);
+        fakeProcessor.Verify(
+            processor => processor.ProcessPaymentAsync(It.IsAny<PaymentRequest>()),
+            Times.Never);
+    }
 }
