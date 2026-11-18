@@ -1,5 +1,6 @@
 <Solution>
   <Project Path="LunchSplit.Cli/LunchSplit.Cli.csproj" Id="5cb5d7c9-3359-4e12-966d-446654f53188" />
   <Project Path="LunchSplit.Core/LunchSplit.Core.csproj" />
+  <Project Path="LunchSplit.Infrastructure/LunchSplit.Infrastructure.csproj" Id="389f59cc-2c64-48e8-bd8a-f373066c2e4f" />
   <Project Path="LunchSplit.Tests/LunchSplit.Tests.csproj" />
 </Solution>
