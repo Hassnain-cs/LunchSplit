@@ -21,10 +21,6 @@
     <Using Include="Microsoft.VisualStudio.TestTools.UnitTesting" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Integration\" />
-  </ItemGroup>
-
 	<ItemGroup>
 		<None Update="appsettings*.json">
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
