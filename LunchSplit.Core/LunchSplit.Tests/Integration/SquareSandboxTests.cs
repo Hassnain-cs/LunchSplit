@@ -87,4 +87,29 @@ public class SquareSandboxTests
         Assert.IsTrue(result.IsSuccess, result.ErrorMessage);
         Assert.IsFalse(string.IsNullOrWhiteSpace(result.TransactionId));
     }
+
+    //
+    // FUNCTION    : ProcessPayment_DeclinedNonce_ReturnsCardDeclined
+    // DESCRIPTION :
+    //   A declined test card must come back as a normal failure result with
+    //   a decline-type error code, and must not throw.
+    // PARAMETERS  : none
+    // RETURNS     : Task : completes when the test finishes
+    //
+    [TestMethod]
+    [TestCategory("M3-02")]
+    public async Task ProcessPayment_DeclinedNonce_ReturnsCardDeclined()
+    {
+        // Arrange
+        PaymentRequest request = BuildRequest(
+            DECLINED_NONCE, squareSettings.Currency, Guid.NewGuid().ToString());
+
+        // Act
+        PaymentResult result = await paymentService.ProcessPaymentAsync(request);
+
+        // Assert: Square's exact code can be CARD_DECLINED or GENERIC_DECLINE,
+        // so we check that it contains DECLINE
+        Assert.IsFalse(result.IsSuccess);
+        StringAssert.Contains(result.ErrorCode, "DECLINE");
+    }
 }

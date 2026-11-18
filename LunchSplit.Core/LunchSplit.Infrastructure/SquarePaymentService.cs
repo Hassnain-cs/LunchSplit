@@ -9,6 +9,7 @@ using LunchSplit.Core.Payments;
 using SquareAuth = Square.Legacy.Authentication;
 using SquareLegacy = Square.Legacy;
 using SquareModels = Square.Legacy.Models;
+using SquareErrors = Square.Legacy.Exceptions;
 
 namespace LunchSplit.Infrastructure;
 
@@ -72,10 +73,25 @@ public class SquarePaymentService : IPaymentProcessor
                 .LocationId(squareSettings.LocationId)
                 .Build();
 
-        SquareModels.CreatePaymentResponse response =
-            await squareClient.PaymentsApi.CreatePaymentAsync(body);
+        PaymentResult result;
 
-        PaymentResult result = PaymentResult.Success(response.Payment.Id);
+        try
+        {
+            SquareModels.CreatePaymentResponse response =
+                await squareClient.PaymentsApi.CreatePaymentAsync(body);
+
+            result = PaymentResult.Success(response.Payment.Id);
+        }
+        catch (SquareErrors.ApiException ex)
+        {
+            // Square sends back a list of errors. We keep the first one,
+            // because it is the main reason the payment failed.
+            SquareModels.Error? firstError = ex.Errors?.FirstOrDefault();
+
+            result = PaymentResult.Failure(
+                firstError?.Code ?? "UNKNOWN_ERROR",
+                firstError?.Detail ?? ex.Message);
+        }
 
         return result;
     }
