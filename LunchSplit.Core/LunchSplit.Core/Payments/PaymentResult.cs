@@ -10,15 +10,15 @@ namespace LunchSplit.Core.Payments;
 /*
  *  NAME    : PaymentResult
  *  PURPOSE : The answer to "did the payment work?". On success it carries
- *            the transaction id; on failure it carries an error code and
- *            message. Use the two factory methods so the fields always
- *            match each other.
+ *            the transaction id; on failure it carries an error code,
+ *            message and, when the gateway gave one, the HTTP status.
  */
 public record PaymentResult(
     bool IsSuccess,
     string? TransactionId,
     string? ErrorCode,
-    string? ErrorMessage)
+    string? ErrorMessage,
+    int? HttpStatusCode = null)
 {
     //
     // FUNCTION    : Success
@@ -37,13 +37,18 @@ public record PaymentResult(
     // FUNCTION    : Failure
     // DESCRIPTION : Builds the result for a payment that did not go through.
     // PARAMETERS  :
-    //   string errorCode    : short machine-readable reason
-    //   string errorMessage : human-readable explanation
+    //   string errorCode     : short machine-readable reason
+    //   string errorMessage  : human-readable explanation
+    //   int? httpStatusCode  : HTTP status from the gateway, if there was one
     // RETURNS     : PaymentResult : IsSuccess false, no transaction id
     //
-    public static PaymentResult Failure(string errorCode, string errorMessage)
+    public static PaymentResult Failure(
+        string errorCode,
+        string errorMessage,
+        int? httpStatusCode = null)
     {
-        PaymentResult result = new PaymentResult(false, null, errorCode, errorMessage);
+        PaymentResult result = new PaymentResult(
+            false, null, errorCode, errorMessage, httpStatusCode);
 
         return result;
     }

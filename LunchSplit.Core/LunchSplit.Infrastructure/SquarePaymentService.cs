@@ -89,8 +89,9 @@ public class SquarePaymentService : IPaymentProcessor
             SquareModels.Error? firstError = ex.Errors?.FirstOrDefault();
 
             result = PaymentResult.Failure(
-                firstError?.Code ?? "UNKNOWN_ERROR",
-                firstError?.Detail ?? ex.Message);
+    firstError?.Code ?? "UNKNOWN_ERROR",
+    firstError?.Detail ?? ex.Message,
+    ex.ResponseCode);
         }
 
         return result;

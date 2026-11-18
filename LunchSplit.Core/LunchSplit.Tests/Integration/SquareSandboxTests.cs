@@ -112,4 +112,28 @@ public class SquareSandboxTests
         Assert.IsFalse(result.IsSuccess);
         StringAssert.Contains(result.ErrorCode, "DECLINE");
     }
+
+    //
+    // FUNCTION    : ProcessPayment_UnsupportedCurrency_FailsWithHttp400
+    // DESCRIPTION :
+    //   Asking for a currency the sandbox account does not use (EUR) must
+    //   fail, and the result must carry Square's HTTP status 400.
+    // PARAMETERS  : none
+    // RETURNS     : Task : completes when the test finishes
+    //
+    [TestMethod]
+    [TestCategory("M3-08")]
+    public async Task ProcessPayment_UnsupportedCurrency_FailsWithHttp400()
+    {
+        // Arrange
+        PaymentRequest request = BuildRequest(
+            VALID_NONCE, "EUR", Guid.NewGuid().ToString());
+
+        // Act
+        PaymentResult result = await paymentService.ProcessPaymentAsync(request);
+
+        // Assert
+        Assert.IsFalse(result.IsSuccess);
+        Assert.AreEqual(400, result.HttpStatusCode);
+    }
 }
