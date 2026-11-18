@@ -107,10 +107,9 @@ public class SquareSandboxTests
         // Act
         PaymentResult result = await paymentService.ProcessPaymentAsync(request);
 
-        // Assert: Square's exact code can be CARD_DECLINED or GENERIC_DECLINE,
-        // so we check that it contains DECLINE
+        // Assert: the spec requires exactly this error code for the declined nonce
         Assert.IsFalse(result.IsSuccess);
-        StringAssert.Contains(result.ErrorCode, "DECLINE");
+        Assert.AreEqual("CARD_DECLINED", result.ErrorCode);
     }
 
     //

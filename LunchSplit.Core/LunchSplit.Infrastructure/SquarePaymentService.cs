@@ -22,6 +22,8 @@ namespace LunchSplit.Infrastructure;
 public class SquarePaymentService : IPaymentProcessor
 {
     private const decimal CENTS_PER_DOLLAR = 100m;
+    private const string SQUARE_GENERIC_DECLINE = "GENERIC_DECLINE";
+    private const string CARD_DECLINED = "CARD_DECLINED";
 
     private readonly SquareLegacy.SquareClient squareClient;
     private readonly SquareSettings squareSettings;
@@ -88,15 +90,37 @@ public class SquarePaymentService : IPaymentProcessor
             // because it is the main reason the payment failed.
             SquareModels.Error? firstError = ex.Errors?.FirstOrDefault();
 
+            string squareCode = firstError?.Code ?? "UNKNOWN_ERROR";
+
             result = PaymentResult.Failure(
-    firstError?.Code ?? "UNKNOWN_ERROR",
-    firstError?.Detail ?? ex.Message,
-    ex.ResponseCode);
+                MapErrorCode(squareCode),
+                firstError?.Detail ?? ex.Message,
+                ex.ResponseCode);
         }
 
         return result;
     }
+    //
+    // FUNCTION    : MapErrorCode
+    // DESCRIPTION :
+    //   Translates Square's own error word into our domain vocabulary, so
+    //   the rest of the app only ever sees our codes. For the sandbox
+    //   declined-card nonce Square answers GENERIC_DECLINE, which we
+    //   report as CARD_DECLINED. Any other code is passed through as is.
+    // PARAMETERS  : string squareCode : the error code Square returned
+    // RETURNS     : string : the code our domain uses
+    //
+    private static string MapErrorCode(string squareCode)
+    {
+        string domainCode = squareCode;
 
+        if (squareCode == SQUARE_GENERIC_DECLINE)
+        {
+            domainCode = CARD_DECLINED;
+        }
+
+        return domainCode;
+    }
     //
     // FUNCTION    : GetTransactionStatusAsync
     // DESCRIPTION :
