@@ -136,4 +136,31 @@ public class SquareSandboxTests
         Assert.IsFalse(result.IsSuccess);
         Assert.AreEqual(400, result.HttpStatusCode);
     }
+
+    //
+    // FUNCTION    : ProcessPayment_DuplicateIdempotencyKey_ReturnsOriginalTransactionId
+    // DESCRIPTION :
+    //   Sending the same request twice with the same key must NOT charge
+    //   twice. Square hands back the original payment, so both calls give
+    //   the same transaction id.
+    // PARAMETERS  : none
+    // RETURNS     : Task : completes when the test finishes
+    //
+    [TestMethod]
+    [TestCategory("M3-09")]
+    public async Task ProcessPayment_DuplicateIdempotencyKey_ReturnsOriginalTransactionId()
+    {
+        // Arrange: one key, used twice
+        string sharedKey = Guid.NewGuid().ToString();
+        PaymentRequest request = BuildRequest(VALID_NONCE, squareSettings.Currency, sharedKey);
+
+        // Act
+        PaymentResult firstResult = await paymentService.ProcessPaymentAsync(request);
+        PaymentResult secondResult = await paymentService.ProcessPaymentAsync(request);
+
+        // Assert
+        Assert.IsTrue(firstResult.IsSuccess, firstResult.ErrorMessage);
+        Assert.IsTrue(secondResult.IsSuccess, secondResult.ErrorMessage);
+        Assert.AreEqual(firstResult.TransactionId, secondResult.TransactionId);
+    }
 }
