@@ -170,4 +170,42 @@ public class PaymentProcessorMoqTests
             processor => processor.ProcessPaymentAsync(It.IsAny<PaymentRequest>()),
             Times.Exactly(ATTENDEE_COUNT));
     }
+
+    //
+    // FUNCTION    : ProcessBatch_SecondAttendeeDeclines_ReportsTwoSuccessesAndOneFailure
+    // DESCRIPTION :
+    //   Three attendees; the middle one's card is declined. The summary must
+    //   show two successes and one failure, and the others must still be charged.
+    // PARAMETERS  : none
+    // RETURNS     : Task : completes when the test finishes
+    //
+    [TestMethod]
+    [TestCategory("M3-07")]
+    public async Task ProcessBatch_SecondAttendeeDeclines_ReportsTwoSuccessesAndOneFailure()
+    {
+        // Arrange: everyone is approved, except the request with the "declined" key
+        Mock<IPaymentProcessor> fakeProcessor = new Mock<IPaymentProcessor>();
+        fakeProcessor
+            .Setup(processor => processor.ProcessPaymentAsync(
+                It.Is<PaymentRequest>(sent => sent.IdempotencyKey != DECLINED_KEY)))
+            .ReturnsAsync(PaymentResult.Success("tx-ok"));
+        fakeProcessor
+            .Setup(processor => processor.ProcessPaymentAsync(
+                It.Is<PaymentRequest>(sent => sent.IdempotencyKey == DECLINED_KEY)))
+            .ReturnsAsync(PaymentResult.Failure("CARD_DECLINED", "The card was declined."));
+        PaymentManager manager = new PaymentManager(fakeProcessor.Object);
+        List<PaymentRequest> requests = new List<PaymentRequest>
+        {
+            SampleRequest(SHARE_AMOUNT, "key-1"),
+            SampleRequest(SHARE_AMOUNT, DECLINED_KEY),
+            SampleRequest(SHARE_AMOUNT, "key-3")
+        };
+
+        // Act
+        BatchPaymentSummary summary = await manager.ProcessBatchAsync(requests);
+
+        // Assert
+        Assert.AreEqual(2, summary.SuccessCount);
+        Assert.AreEqual(1, summary.FailureCount);
+    }
 }
