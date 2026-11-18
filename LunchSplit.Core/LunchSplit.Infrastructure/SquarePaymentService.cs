@@ -99,12 +99,29 @@ public class SquarePaymentService : IPaymentProcessor
 
     //
     // FUNCTION    : GetTransactionStatusAsync
-    // DESCRIPTION : Not built yet. It is added in test M3-10.
+    // DESCRIPTION :
+    //   Asks Square for a payment by id and translates Square's status
+    //   word into our PaymentStatus list.
     // PARAMETERS  : string transactionId : id of the earlier payment
-    // RETURNS     : Task<PaymentStatus> : never returns for now
+    // RETURNS     : Task<PaymentStatus> : our version of the status
     //
-    public Task<PaymentStatus> GetTransactionStatusAsync(string transactionId)
+    public async Task<PaymentStatus> GetTransactionStatusAsync(string transactionId)
     {
-        throw new NotImplementedException("Built in M3-10.");
+        SquareModels.GetPaymentResponse response =
+            await squareClient.PaymentsApi.GetPaymentAsync(transactionId);
+
+        string statusText = response.Payment.Status ?? string.Empty;
+
+        PaymentStatus status = statusText switch
+        {
+            "COMPLETED" => PaymentStatus.COMPLETED,
+            "APPROVED" => PaymentStatus.APPROVED,
+            "PENDING" => PaymentStatus.PENDING,
+            "CANCELED" => PaymentStatus.CANCELED,
+            "FAILED" => PaymentStatus.FAILED,
+            _ => PaymentStatus.UNKNOWN
+        };
+
+        return status;
     }
 }

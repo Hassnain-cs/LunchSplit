@@ -163,4 +163,28 @@ public class SquareSandboxTests
         Assert.IsTrue(secondResult.IsSuccess, secondResult.ErrorMessage);
         Assert.AreEqual(firstResult.TransactionId, secondResult.TransactionId);
     }
+
+    //
+    // FUNCTION    : GetTransactionStatus_CompletedPayment_ReturnsCompleted
+    // DESCRIPTION :
+    //   After a successful payment, looking its status up by id must say COMPLETED.
+    // PARAMETERS  : none
+    // RETURNS     : Task : completes when the test finishes
+    //
+    [TestMethod]
+    [TestCategory("M3-10")]
+    public async Task GetTransactionStatus_CompletedPayment_ReturnsCompleted()
+    {
+        // Arrange: make a real sandbox payment first
+        PaymentRequest request = BuildRequest(
+            VALID_NONCE, squareSettings.Currency, Guid.NewGuid().ToString());
+        PaymentResult payment = await paymentService.ProcessPaymentAsync(request);
+        Assert.IsTrue(payment.IsSuccess, payment.ErrorMessage);
+
+        // Act
+        PaymentStatus status = await paymentService.GetTransactionStatusAsync(payment.TransactionId!);
+
+        // Assert
+        Assert.AreEqual(PaymentStatus.COMPLETED, status);
+    }
 }
